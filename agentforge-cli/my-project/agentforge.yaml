@@ -1,0 +1,19 @@
+project:
+  name: ./my-project
+  version: 0.1.0
+
+runtime:
+  mode: development
+
+agent:
+  default: default
+
+model:
+  provider: default
+  model: default
+
+observability:
+  enabled: true
+
+security:
+  enabled: true

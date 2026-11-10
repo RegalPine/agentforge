@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+           http://maven.apache.org/POM/4.0.0
+           https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.regalpine.agentforge</groupId>
+    <artifactId>agentforge</artifactId>
+    <version>0.1.0</version>
+    <packaging>pom</packaging>
+
+    <name>AgentForge</name>
+    <description>
+        Independent Agent Development Framework and Graph Orchestration Engine
+    </description>
+    <url>https://github.com/regalpine/agentforge</url>
+    <inceptionYear>2024</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>regalpine</id>
+            <name>Regalpine Team</name>
+            <url>https://github.com/regalpine</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/regalpine/agentforge.git</connection>
+        <developerConnection>scm:git:git@github.com:regalpine/agentforge.git</developerConnection>
+        <url>https://github.com/regalpine/agentforge</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/regalpine/agentforge/issues</url>
+    </issueManagement>
+
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>5.10.2</junit.version>
+        <test.groups>!integration &amp; !security &amp; !benchmark</test.groups>
+        <integration.groups>integration</integration.groups>
+        <testcontainers.version>1.20.6</testcontainers.version>
+        <postgresql.version>42.7.5</postgresql.version>
+        <jackson.version>2.17.2</jackson.version>
+        <flyway.version>10.15.0</flyway.version>
+        <h2.version>2.2.224</h2.version>
+    </properties>
+
+    <modules>
+        <module>agentforge-bom</module>
+        <module>agentforge-kernel</module>
+        <module>agentforge-skill-governance</module>
+        <module>agentforge-model</module>
+        <module>agentforge-agent</module>
+        <module>agentforge-capability</module>
+        <module>agentforge-capability-http</module>
+        <module>agentforge-capability-jdbc</module>
+        <module>agentforge-capability-file</module>
+        <module>agentforge-graph</module>
+        <module>agentforge-graph-ir</module>
+        <module>agentforge-compiler</module>
+        <module>agentforge-runtime</module>
+        <module>agentforge-event</module>
+        <module>agentforge-persistence</module>
+        <module>agentforge-persistence-postgresql</module>
+        <module>agentforge-distributed</module>
+        <module>agentforge-distributed-redis</module>
+        <module>agentforge-security</module>
+        <module>agentforge-sdk</module>
+        <module>agentforge-observability</module>
+        <module>agentforge-server</module>
+        <module>agentforge-cli</module>
+        <module>agentforge-provider-spi</module>
+        <module>agentforge-provider-mock</module>
+        <module>agentforge-provider-calculator</module>
+        <module>agentforge-provider-http</module>
+        <module>agentforge-provider-agent</module>
+        <module>agentforge-provider-llm</module>
+        <module>agentforge-provider-mcp</module>
+        <module>agentforge-provider-openai</module>
+        <module>agentforge-provider-anthropic</module>
+        <module>agentforge-provider-ollama</module>
+        <module>agentforge-provider-openai-compatible</module>
+        <module>agentforge-memory</module>
+        <module>agentforge-memory-postgresql</module>
+        <module>agentforge-memory-redis</module>
+        <module>agentforge-evaluation</module>
+        <module>agentforge-rag</module>
+        <module>agentforge-rag-postgresql</module>
+        <module>agentforge-rag-opensearch</module>
+        <module>agentforge-rag-qdrant</module>
+        <module>agentforge-multi-agent</module>
+        <module>agentforge-debugger</module>
+        <module>agentforge-testkit</module>
+        <module>agentforge-workspace</module>
+        <module>agentforge-test-fault</module>
+        <module>agentforge-benchmark</module>
+        <module>agentforge-hardening-tck</module>
+        <module>agentforge-a2a</module>
+        <module>agentforge-service</module>
+        <module>agentforge-multimodal</module>
+        <module>agentforge-control-plane</module>
+        <module>agentforge-evolution</module>
+        <module>agentforge-architecture-tests</module>
+        <module>agentforge-examples</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-database-postgresql</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.lettuce</groupId>
+                <artifactId>lettuce-core</artifactId>
+                <version>6.4.0.RELEASE</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <release>17</release>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.2.5</version>
+                    <configuration>
+                        <groups>${test.groups}</groups>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.2.5</version>
+                    <configuration>
+                        <groups>${integration.groups}</groups>
+                        <includes>
+                            <include>**/*IT.java</include>
+                        </includes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Default: unit tests only -->
+        <profile>
+            <id>unit</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <test.groups>!integration &amp; !security &amp; !benchmark</test.groups>
+            </properties>
+        </profile>
+
+        <!-- Integration tests -->
+        <profile>
+            <id>integration</id>
+            <properties>
+                <test.groups>integration</test.groups>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Security-focused tests -->
+        <profile>
+            <id>security</id>
+            <properties>
+                <test.groups>security</test.groups>
+            </properties>
+        </profile>
+
+        <!-- Benchmark tests -->
+        <profile>
+            <id>benchmark</id>
+            <properties>
+                <test.groups>benchmark</test.groups>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>all-tests</id>
+            <properties>
+                <test.groups></test.groups>
+                <integration.groups></integration.groups>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Full release: all checks -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.6.3</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

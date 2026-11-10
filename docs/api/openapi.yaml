@@ -1,0 +1,1417 @@
+openapi: "3.0.3"
+info:
+  title: AgentForge Server API
+  description: |
+    REST API for AgentForge Studio.
+    Covers core endpoint groups: Graphs, Executions, Agents, Skills.
+    All requests require `X-Tenant-Id` header and `Authorization: Bearer <token>`.
+  version: "0.1.0"
+  contact:
+    name: AgentForge Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+    # ── Shared parameter schemas ──
+  parameters:
+    tenantHeader:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema:
+        type: string
+    versionQuery:
+      name: version
+      in: query
+      schema:
+        type: string
+    limitQuery:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+    offsetQuery:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+
+  # ── Reusable error response ──
+  responses:
+    BadRequest:
+      description: Invalid request body or parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+    Conflict:
+      description: Optimistic locking conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+
+  schemas:
+    # ── Common ──
+    ApiErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+    Reference:
+      type: object
+      required: [id, version]
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+
+    # ── Graph ──
+    GraphDefinition:
+      type: object
+      required: [id, version, name, inputs, outputs, nodes, edges, bindings, expressions, policies, metadata]
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        inputs:
+          type: object
+          additionalProperties: true
+        outputs:
+          type: object
+          additionalProperties: true
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/NodeDefinition"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/EdgeDefinition"
+        bindings:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataBinding"
+        expressions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Expression"
+        policies:
+          type: object
+          additionalProperties: true
+        metadata:
+          type: object
+          additionalProperties: true
+
+    NodeDefinition:
+      type: object
+      required: [id, type, config]
+      properties:
+        id:
+          type: string
+        type:
+          $ref: "#/components/schemas/NodeType"
+        name:
+          type: string
+        agent:
+          $ref: "#/components/schemas/Reference"
+        capability:
+          $ref: "#/components/schemas/Reference"
+        config:
+          type: object
+          additionalProperties: true
+        metadata:
+          type: object
+          additionalProperties: true
+
+    NodeType:
+      type: string
+      enum:
+        - START
+        - END
+        - ACTION
+        - AGENT
+        - CAPABILITY
+        - TOOL
+        - LLM
+        - CONDITION
+        - SWITCH
+        - PARALLEL
+        - JOIN
+        - LOOP
+        - ITERATOR
+        - WAIT
+        - HUMAN
+        - SUBGRAPH
+
+    EdgeDefinition:
+      type: object
+      required: [id, source, target, type]
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+        target:
+          type: string
+        type:
+          $ref: "#/components/schemas/EdgeType"
+        condition:
+          type: string
+
+    EdgeType:
+      type: string
+      enum:
+        - NORMAL
+        - CONDITIONAL
+        - ERROR
+        - LOOP_BACK
+
+    DataBinding:
+      type: object
+      required: [source, target]
+      properties:
+        source:
+          type: string
+        target:
+          type: string
+        transform:
+          type: string
+
+    Expression:
+      type: object
+      required: [id, language, body]
+      properties:
+        id:
+          type: string
+        language:
+          type: string
+        body:
+          type: string
+
+    GraphSummary:
+      type: object
+      required: [id, version, name, status, nodeCount, edgeCount, createdAt]
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, DEPRECATED]
+        nodeCount:
+          type: integer
+        edgeCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    ValidationResult:
+      type: object
+      required: [valid]
+      properties:
+        valid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              nodeId:
+                type: string
+              message:
+                type: string
+              severity:
+                type: string
+                enum: [ERROR, WARNING]
+        warnings:
+          type: array
+          items:
+            type: object
+            properties:
+              nodeId:
+                type: string
+              message:
+                type: string
+
+    CompilationResult:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [SUCCESS, FAILED]
+        diagnostics:
+          type: array
+          items:
+            type: object
+            properties:
+              nodeId:
+                type: string
+              stage:
+                type: string
+              message:
+                type: string
+              severity:
+                type: string
+                enum: [ERROR, WARNING, INFO]
+        fingerprint:
+          type: string
+        compiledAt:
+          type: string
+          format: date-time
+
+    # ── Execution ──
+    ExecutionRequest:
+      type: object
+      required: [graphId, graphVersion]
+      properties:
+        graphId:
+          type: string
+        graphVersion:
+          type: string
+        input:
+          type: object
+          additionalProperties: true
+        timeout:
+          type: string
+
+    ExecutionHandle:
+      type: object
+      required: [executionId, status]
+      properties:
+        executionId:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, RUNNING, COMPLETED, FAILED, CANCELLED, PAUSED]
+
+    Execution:
+      type: object
+      required: [id, graphId, graphVersion, status, tenantId, createdAt]
+      properties:
+        id:
+          type: string
+        graphId:
+          type: string
+        graphVersion:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, RUNNING, COMPLETED, FAILED, CANCELLED, PAUSED]
+        tenantId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        error:
+          type: string
+
+    ExecutionState:
+      type: object
+      required: [executionId, nodeStates]
+      properties:
+        executionId:
+          type: string
+        nodeStates:
+          type: array
+          items:
+            type: object
+            properties:
+              nodeId:
+                type: string
+              status:
+                type: string
+              input:
+                type: object
+                additionalProperties: true
+              output:
+                type: object
+                additionalProperties: true
+
+    ExecutionEvent:
+      type: object
+      required: [sequence, type, timestamp]
+      properties:
+        sequence:
+          type: integer
+        type:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        nodeId:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+
+    # ── Agent ──
+    AgentDescriptor:
+      type: object
+      required: [id, name, version, status]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, ACTIVE, DEPRECATED, RETIRED]
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        capabilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reference"
+        graphBindings:
+          type: array
+          items:
+            type: object
+
+    AgentSummaryView:
+      type: object
+      required: [id, name, version, status]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        status:
+          type: string
+        description:
+          type: string
+        graphCount:
+          type: integer
+        lastExecutedAt:
+          type: string
+          format: date-time
+
+    AgentOverview:
+      type: object
+      required: [id, name, version, status]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        status:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        capabilities:
+          type: array
+          items:
+            type: object
+        recentExecutions:
+          type: array
+          items:
+            type: object
+        metrics:
+          type: object
+          additionalProperties: true
+
+    AgentDefinitionView:
+      type: object
+      required: [id, name, version, status]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        status:
+          type: string
+        identity:
+          type: object
+          additionalProperties: true
+        contract:
+          type: object
+          additionalProperties: true
+        model:
+          type: object
+          additionalProperties: true
+        memoryPolicy:
+          type: object
+          additionalProperties: true
+        knowledgePolicy:
+          type: object
+          additionalProperties: true
+        executionPolicy:
+          type: object
+          additionalProperties: true
+
+    AgentVersionView:
+      type: object
+      required: [version, status, createdAt]
+      properties:
+        version:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        changelog:
+          type: string
+
+    # ── Skill ──
+    SkillSummaryView:
+      type: object
+      required: [id, name, version, lifecycleState]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        lifecycleState:
+          type: string
+          enum: [DRAFT, ACTIVE, DEPRECATED, RETIRED]
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    SkillOverviewView:
+      type: object
+      required: [id, name, version, lifecycleState]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        lifecycleState:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        usageStats:
+          type: object
+          additionalProperties: true
+        healthStatus:
+          type: string
+
+    SkillContractView:
+      type: object
+      required: [id, version]
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        inputSchema:
+          type: object
+          additionalProperties: true
+        outputSchema:
+          type: object
+          additionalProperties: true
+        errorContracts:
+          type: array
+          items:
+            type: object
+        slas:
+          type: array
+          items:
+            type: object
+
+    SkillDependencyView:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        dependencies:
+          type: array
+          items:
+            type: object
+            properties:
+              targetId:
+                type: string
+              targetType:
+                type: string
+              versionConstraint:
+                type: string
+              required:
+                type: boolean
+
+    SkillSecurityView:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        sideEffectClassification:
+          type: object
+          additionalProperties: true
+        dataHandling:
+          type: object
+          additionalProperties: true
+        authRequirements:
+          type: array
+          items:
+            type: string
+
+    SkillEvaluationView:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        results:
+          type: array
+          items:
+            type: object
+        lastEvaluatedAt:
+          type: string
+          format: date-time
+        overallScore:
+          type: number
+
+    SkillVersionView:
+      type: object
+      required: [version, lifecycleState, createdAt]
+      properties:
+        version:
+          type: string
+        lifecycleState:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        changelog:
+          type: string
+
+    SkillGovernanceView:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        policies:
+          type: array
+          items:
+            type: object
+        auditTrail:
+          type: array
+          items:
+            type: object
+        complianceStatus:
+          type: string
+
+    SkillUsageView:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        invocationCount:
+          type: integer
+        errorRate:
+          type: number
+        avgLatencyMs:
+          type: number
+        period:
+          type: string
+
+    SkillExecutionView:
+      type: object
+      required: [id, skillId, status, startedAt]
+      properties:
+        id:
+          type: string
+        skillId:
+          type: string
+        status:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        input:
+          type: object
+          additionalProperties: true
+        output:
+          type: object
+          additionalProperties: true
+        error:
+          type: string
+
+    SkillInvocationRequest:
+      type: object
+      required: [skillId, input]
+      properties:
+        skillId:
+          type: string
+        version:
+          type: string
+        input:
+          type: object
+          additionalProperties: true
+        timeout:
+          type: string
+
+    SkillInvocationResult:
+      type: object
+      required: [executionId, status]
+      properties:
+        executionId:
+          type: string
+        status:
+          type: string
+          enum: [SUCCESS, FAILED, TIMEOUT]
+        output:
+          type: object
+          additionalProperties: true
+        latencyMs:
+          type: integer
+        error:
+          type: string
+
+paths:
+  # ══════════════════════════════════════════
+  # Graphs
+  # ══════════════════════════════════════════
+  /api/v1/graphs:
+    get:
+      operationId: listGraphs
+      summary: List all graph definitions
+      tags: [Graphs]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: List of graph summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GraphSummary"
+    post:
+      operationId: createGraph
+      summary: Create a new graph definition
+      tags: [Graphs]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GraphDefinition"
+      responses:
+        "201":
+          description: Graph created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphDefinition"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/graphs/{id}:
+    get:
+      operationId: getGraph
+      summary: Get a graph definition by ID
+      tags: [Graphs]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/versionQuery"
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Graph definition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: updateGraph
+      summary: Update a graph definition
+      tags: [Graphs]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: expectedRevision
+          in: query
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/tenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GraphDefinition"
+      responses:
+        "200":
+          description: Graph updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphDefinition"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      operationId: deleteGraph
+      summary: Delete a graph definition
+      tags: [Graphs]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "204":
+          description: Graph deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/graphs/validate:
+    post:
+      operationId: validateGraph
+      summary: Validate a graph definition
+      tags: [Graphs]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GraphDefinition"
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResult"
+
+  /api/v1/graphs/compile:
+    post:
+      operationId: compileGraph
+      summary: Compile a graph definition
+      tags: [Graphs]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GraphDefinition"
+      responses:
+        "200":
+          description: Compilation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompilationResult"
+
+  # ══════════════════════════════════════════
+  # Executions
+  # ══════════════════════════════════════════
+  /api/v1/executions:
+    post:
+      operationId: createExecution
+      summary: Submit a new execution
+      tags: [Executions]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecutionRequest"
+      responses:
+        "201":
+          description: Execution created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecutionHandle"
+    get:
+      operationId: listExecutions
+      summary: List executions
+      tags: [Executions]
+      parameters:
+        - $ref: "#/components/parameters/limitQuery"
+        - $ref: "#/components/parameters/offsetQuery"
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: List of executions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Execution"
+
+  /api/v1/executions/{id}:
+    get:
+      operationId: getExecution
+      summary: Get execution details
+      tags: [Executions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Execution details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execution"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/executions/{id}/state:
+    get:
+      operationId: getExecutionState
+      summary: Get execution state
+      tags: [Executions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Execution state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecutionState"
+
+  /api/v1/executions/{id}/pause:
+    post:
+      operationId: pauseExecution
+      summary: Pause a running execution
+      tags: [Executions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Execution paused
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/executions/{id}/resume:
+    post:
+      operationId: resumeExecution
+      summary: Resume a paused execution
+      tags: [Executions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Execution resumed
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/executions/{id}/cancel:
+    post:
+      operationId: cancelExecution
+      summary: Cancel a running execution
+      tags: [Executions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Execution cancelled
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/executions/{id}/events:
+    get:
+      operationId: getExecutionEvents
+      summary: Get execution events
+      tags: [Executions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: after
+          in: query
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Execution events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExecutionEvent"
+
+  # ══════════════════════════════════════════
+  # Agents
+  # ══════════════════════════════════════════
+  /api/v1/agents:
+    get:
+      operationId: listAgents
+      summary: List all agent descriptors
+      tags: [Agents]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentDescriptor"
+
+  /api/v1/agents/summaries:
+    get:
+      operationId: listAgentSummaries
+      summary: List agent summaries with metrics
+      tags: [Agents]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Agent summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentSummaryView"
+
+  /api/v1/agents/{agentId}/overview:
+    get:
+      operationId: getAgentOverview
+      summary: Get agent overview
+      tags: [Agents]
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Agent overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentOverview"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/agents/{agentId}/definition:
+    get:
+      operationId: getAgentDefinition
+      summary: Get agent definition
+      tags: [Agents]
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/versionQuery"
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Agent definition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentDefinitionView"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/agents/{agentId}/versions:
+    get:
+      operationId: listAgentVersions
+      summary: List agent versions
+      tags: [Agents]
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Agent versions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentVersionView"
+
+  # ══════════════════════════════════════════
+  # Skills
+  # ══════════════════════════════════════════
+  /api/v1/skills:
+    get:
+      operationId: listSkills
+      summary: List all skills
+      tags: [Skills]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: List of skills
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SkillSummaryView"
+
+  /api/v1/skills/invoke:
+    post:
+      operationId: invokeSkill
+      summary: Invoke a skill
+      tags: [Skills]
+      parameters:
+        - $ref: "#/components/parameters/tenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SkillInvocationRequest"
+      responses:
+        "200":
+          description: Skill invocation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillInvocationResult"
+
+  /api/v1/skills/{skillId}/overview:
+    get:
+      operationId: getSkillOverview
+      summary: Get skill overview
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillOverviewView"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/skills/{skillId}/contract:
+    get:
+      operationId: getSkillContract
+      summary: Get skill contract
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/versionQuery"
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill contract
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillContractView"
+
+  /api/v1/skills/{skillId}/dependencies:
+    get:
+      operationId: getSkillDependencies
+      summary: Get skill dependencies
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill dependencies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillDependencyView"
+
+  /api/v1/skills/{skillId}/security:
+    get:
+      operationId: getSkillSecurity
+      summary: Get skill security view
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill security view
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillSecurityView"
+
+  /api/v1/skills/{skillId}/evaluation:
+    get:
+      operationId: getSkillEvaluation
+      summary: Get skill evaluation results
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill evaluation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillEvaluationView"
+
+  /api/v1/skills/{skillId}/versions:
+    get:
+      operationId: listSkillVersions
+      summary: List skill versions
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill versions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SkillVersionView"
+
+  /api/v1/skills/{skillId}/governance:
+    get:
+      operationId: getSkillGovernance
+      summary: Get skill governance view
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill governance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillGovernanceView"
+
+  /api/v1/skills/{skillId}/usage:
+    get:
+      operationId: getSkillUsage
+      summary: Get skill usage metrics
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill usage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillUsageView"
+
+  /api/v1/skills/{skillId}/executions:
+    get:
+      operationId: listSkillExecutions
+      summary: List skill executions
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/limitQuery"
+        - $ref: "#/components/parameters/tenantHeader"
+      responses:
+        "200":
+          description: Skill executions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SkillExecutionView"
+
+  /api/v1/skills/{skillId}/versions/{version}/lifecycle:
+    put:
+      operationId: transitionSkillLifecycle
+      summary: Transition skill lifecycle state
+      tags: [Skills]
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/tenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetState]
+              properties:
+                targetState:
+                  type: string
+                  enum: [DRAFT, ACTIVE, DEPRECATED, RETIRED]
+      responses:
+        "200":
+          description: Lifecycle transition successful
+        "400":
+          $ref: "#/components/responses/BadRequest"

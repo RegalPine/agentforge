@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentforge-server
+  labels:
+    app: agentforge
+    component: server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agentforge
+      component: server
+  template:
+    metadata:
+      labels:
+        app: agentforge
+        component: server
+    spec:
+      serviceAccountName: agentforge
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+      containers:
+        - name: agentforge-server
+          image: agentforge/server:0.1.0
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: AGENTFORGE_SERVER_PORT
+              value: "8080"
+            - name: AGENTFORGE_DEPLOYMENT_MODE
+              value: "production"
+            - name: AGENTFORGE_DATABASE_TYPE
+              value: "postgresql"
+            - name: AGENTFORGE_DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: agentforge-config
+                  key: database-url
+            - name: AGENTFORGE_DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: agentforge-secrets
+                  key: db-username
+            - name: AGENTFORGE_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: agentforge-secrets
+                  key: db-password
+            - name: AGENTFORGE_REDIS_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: agentforge-config
+                  key: redis-uri
+            - name: AGENTFORGE_SESSION_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agentforge-secrets
+                  key: session-signing-key
+            - name: AGENTFORGE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: agentforge-secrets
+                  key: admin-password
+            - name: JAVA_OPTS
+              value: "-XX:+UseG1GC -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false

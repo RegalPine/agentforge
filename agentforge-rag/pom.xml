@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+           http://maven.apache.org/POM/4.0.0
+           https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.regalpine.agentforge</groupId>
+        <artifactId>agentforge</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
+    <artifactId>agentforge-rag</artifactId>
+    <name>AgentForge :: RAG</name>
+    <description>
+        AE-09 RAG &amp; Knowledge Retrieval: Knowledge Source,
+        Document Ingestion, Parsing, Chunking, Embedding,
+        Indexing, Retrieval Pipeline, Reranking, Citation,
+        Knowledge Policy, Knowledge Provider.
+    </description>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-kernel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

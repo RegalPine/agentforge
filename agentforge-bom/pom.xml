@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+           http://maven.apache.org/POM/4.0.0
+           https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.regalpine.agentforge</groupId>
+        <artifactId>agentforge</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
+    <artifactId>agentforge-bom</artifactId>
+    <packaging>pom</packaging>
+    <name>AgentForge :: BOM</name>
+    <description>
+        Bill of Materials for AgentForge.
+        Import this BOM to manage all AgentForge dependency versions centrally.
+    </description>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Third-party: Jackson Core (JSON parsing) -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.17.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>10.15.0</version>
+            </dependency>
+            <!-- BE-07: Netty HTTP server (minimal dependency) -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http</artifactId>
+                <version>4.2.1.Final</version>
+            </dependency>
+
+            <!-- Core -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-kernel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-skill-governance</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-agent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-capability</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-graph</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-graph-ir</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-compiler</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Runtime -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-runtime</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-event</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Platform -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-persistence</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-persistence-postgresql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-distributed</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-distributed-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-observability</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Server & CLI -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Provider Spi -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- Reference Providers -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-mock</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-calculator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-agent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-llm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-mcp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- Provider Ecosystem (H0) -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-openai</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-anthropic</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-ollama</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-provider-openai-compatible</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- Model (E0) -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- Capability Adapters (H1) -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-capability-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-capability-jdbc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-capability-file</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- Memory & RAG (H2) -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-memory</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-memory-postgresql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-memory-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-rag</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-rag-postgresql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-rag-opensearch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-rag-qdrant</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- SDK & Evaluation -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-sdk</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-evaluation</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-multi-agent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Testing -->
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-test-fault</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-hardening-tck</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.regalpine.agentforge</groupId>
+                <artifactId>agentforge-benchmark</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

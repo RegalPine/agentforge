@@ -1,0 +1,50 @@
+/**
+ * CSS custom properties for the AgentForge design system.
+ * These variables are applied via .light / .dark classes on :root.
+ *
+ * No business semantics in color names - only visual roles.
+ */
+export const themeTokens = {
+  light: {
+    "--background": "0 0% 100%",
+    "--foreground": "222.2 84% 4.9%",
+    "--border": "214.3 31.8% 91.4%",
+    "--primary": "222.2 47.4% 11.2%",
+    "--primary-foreground": "210 40% 98%",
+    "--secondary": "210 40% 96.1%",
+    "--secondary-foreground": "222.2 47.4% 11.2%",
+    "--muted": "210 40% 96.1%",
+    "--muted-foreground": "215.4 16.3% 46.9%",
+    "--accent": "210 40% 96.1%",
+    "--accent-foreground": "222.2 47.4% 11.2%",
+    "--danger": "0 84.2% 60.2%",
+    "--danger-foreground": "210 40% 98%",
+    "--warning": "38 92% 50%",
+    "--warning-foreground": "48 96% 89%",
+    "--success": "142 76% 36%",
+    "--success-foreground": "355 100% 100%",
+    "--ring": "222.2 84% 4.9%",
+  },
+  dark: {
+    "--background": "222.2 84% 4.9%",
+    "--foreground": "210 40% 98%",
+    "--border": "217.2 32.6% 17.5%",
+    "--primary": "210 40% 98%",
+    "--primary-foreground": "222.2 47.4% 11.2%",
+    "--secondary": "217.2 32.6% 17.5%",
+    "--secondary-foreground": "210 40% 98%",
+    "--muted": "217.2 32.6% 17.5%",
+    "--muted-foreground": "215 20.2% 65.1%",
+    "--accent": "217.2 32.6% 17.5%",
+    "--accent-foreground": "210 40% 98%",
+    "--danger": "0 62.8% 30.6%",
+    "--danger-foreground": "210 40% 98%",
+    "--warning": "38 92% 50%",
+    "--warning-foreground": "48 96% 89%",
+    "--success": "142 76% 36%",
+    "--success-foreground": "355 100% 100%",
+    "--ring": "212.7 26.8% 83.9%",
+  },
+} as const;
+
+export type ThemeTokenKey = keyof typeof themeTokens.light;

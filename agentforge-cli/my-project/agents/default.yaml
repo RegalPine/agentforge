@@ -1,0 +1,9 @@
+id: default
+name: ./my-project
+
+model:
+  ref: default
+
+skills: []
+
+tools: []

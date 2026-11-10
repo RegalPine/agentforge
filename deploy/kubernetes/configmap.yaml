@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentforge-config
+  labels:
+    app: agentforge
+data:
+  database-url: "jdbc:postgresql://postgres:5432/agentforge"
+  redis-uri: "redis://redis:6379"
+  server-port: "8080"

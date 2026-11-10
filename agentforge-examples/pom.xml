@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+           http://maven.apache.org/POM/4.0.0
+           https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.regalpine.agentforge</groupId>
+        <artifactId>agentforge</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
+    <artifactId>agentforge-examples</artifactId>
+    <name>AgentForge :: Examples</name>
+    <description>
+        Golden Path examples demonstrating end-to-end AgentForge usage.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-kernel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-graph</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-compiler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-capability</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-provider-mock</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-provider-calculator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-hardening-tck</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-evaluation</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-sdk</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.regalpine.agentforge</groupId>
+            <artifactId>agentforge-event</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -1,0 +1,233 @@
+/* AgentForge Studio - Global Styles (Workstation IDE Design System) */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Workstation IDE CSS Variables (GitHub-dark + Apple Dev palette) ── */
+@layer base {
+  :root {
+    /* ── Surface 容器层级 (GitHub-dark 风格) ── */
+    --surface:              13 17 23;     /* #0D1117 — Canvas Floor L0 */
+    --surface-dim:          15 20 27;     /* #0F141B */
+    --surface-container-lowest: 9 15 21;  /* #090F15 */
+    --surface-container-low: 22 27 34;    /* #161B22 — Sidebar L1 */
+    --surface-container:    27 32 39;     /* #1B2027 */
+    --surface-container-high: 37 42 50;   /* #252A32 */
+    --surface-container-highest: 48 53 61;/* #30353D */
+    --surface-bright:       52 57 65;     /* #343941 */
+
+    /* ── 文字色 ── */
+    --on-surface:           222 226 236;  /* #DEE2EC */
+    --on-surface-variant:   192 198 214;  /* #C0C6D6 */
+    --outline:              139 145 160;  /* #8B91A0 */
+    --outline-variant:      65 71 84;     /* #414754 */
+
+    /* ── 主色 (Apple Dev Blue) ── */
+    --primary:              170 199 255;  /* #AAC7FF */
+    --on-primary:           0 48 100;     /* #003064 */
+    --primary-container:    62 144 255;   /* #3E90FF */
+    --accent-primary:       10 132 255;   /* #0A84FF — 交互高亮 */
+
+    /* ── 语义强调色 ── */
+    --accent-secondary:     168 85 247;   /* #A855F7 — Agent/LLM */
+    --accent-tertiary:      6 182 212;    /* #06B6D4 — Control Flow */
+    --accent-tool:          245 158 11;   /* #F59E0B — Capability/Tool */
+    --color-success:        34 197 94;    /* #22C55E */
+    --color-error:          239 68 68;    /* #EF4444 */
+
+    /* ── 间距 (4px 网格，更紧凑) ── */
+    --space-xs: 0.25rem;   /* 4px */
+    --space-sm: 0.5rem;    /* 8px */
+    --space-md: 0.75rem;   /* 12px */
+    --space-lg: 1rem;      /* 16px */
+    --space-xl: 1.5rem;    /* 24px */
+
+    /* ── 圆角 (缩小，IDE 风格) ── */
+    --radius-sm: 0.125rem;  /* 2px */
+    --radius-default: 0.25rem; /* 4px */
+    --radius-md: 0.375rem;  /* 6px */
+    --radius-lg: 0.5rem;    /* 8px */
+    --radius-xl: 0.75rem;   /* 12px */
+
+    /* ── 字体 ── */
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* ── 字号 (紧凑) ── */
+    --text-xs: 0.6875rem;   /* 11px */
+    --text-sm: 0.75rem;     /* 12px */
+    --text-base: 0.8125rem; /* 13px */
+    --text-lg: 0.875rem;    /* 14px */
+    --text-xl: 1.25rem;     /* 20px */
+    --text-2xl: 1.75rem;    /* 28px */
+
+    /* ── 阴影 (border + glow 策略) ── */
+    --shadow-sm: none;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.65);
+    --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+    /* ── 动画 (保留) ── */
+    --duration-fast: 150ms;
+    --duration-normal: 250ms;
+    --duration-slow: 350ms;
+    --ease-mac: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --ease-mac-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* ── 向后兼容别名 (旧组件过渡期使用) ── */
+    --color-background: var(--surface);
+    --color-foreground: var(--on-surface);
+    --color-muted: var(--surface-container-low);
+    --color-muted-foreground: var(--outline);
+    --color-border: var(--outline-variant);
+    --color-primary: var(--accent-primary);
+    --color-primary-hover: 0 113 227;
+    --color-primary-active: 0 91 181;
+    --color-primary-foreground: 255 255 255;
+    --color-destructive: var(--color-error);
+    --color-destructive-foreground: 255 255 255;
+    --color-warning: var(--accent-tool);
+  }
+
+  .dark {
+    /* IDE 风格仅暗色模式，暗色为默认 */
+  }
+
+  .light {
+    /* 浅色模式暂保留旧值，后续迭代 */
+    --surface:              255 255 255;
+    --surface-container-low: 245 245 247;
+    --surface-container:    235 235 237;
+    --surface-container-high: 220 220 225;
+    --on-surface:           29 29 31;
+    --on-surface-variant:   80 80 85;
+    --outline:              134 134 139;
+    --outline-variant:      210 210 215;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: rgb(var(--surface));
+    color: rgb(var(--on-surface));
+    font-size: var(--text-base);
+    line-height: 1.38;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* ── Page-level layout utilities (non-component styles) ── */
+@layer components {
+  .af-page { /* IDE layout is fluid, no max-width */ }
+  .af-page__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md); }
+  .af-page__body { margin-top: var(--space-sm); }
+  .af-page__subtitle { font-size: var(--text-sm); color: rgb(var(--outline)); }
+  .af-page__hint { font-size: var(--text-xs); color: rgb(var(--outline)); margin-top: var(--space-sm); font-style: italic; }
+
+  /* Editor page layout */
+  .af-editor-page { display: flex; flex-direction: column; height: calc(100vh - 48px); }
+  .af-editor-page__toolbar { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem var(--space-md); border-bottom: 1px solid rgb(var(--outline-variant)); background: rgb(var(--surface-container-lowest)); }
+  .af-editor-page__title { font-weight: 600; }
+  .af-editor-page__actions { display: flex; gap: 0.5rem; }
+  .af-editor-page__body { display: flex; flex: 1; overflow: hidden; }
+  .af-editor-page__palette { width: 200px; border-right: 1px solid rgb(var(--outline-variant)); padding: var(--space-xs); overflow-y: auto; background: rgb(var(--surface-container-low)); }
+  .af-editor-page__canvas { flex: 1; background: rgb(var(--surface)); background-image: radial-gradient(rgb(var(--outline-variant)) 1px, transparent 1px); background-size: 16px 16px; }
+  .af-editor-page__properties { width: 280px; border-left: 1px solid rgb(var(--outline-variant)); padding: var(--space-xs); overflow-y: auto; background: rgb(var(--surface-container-low)); }
+  .af-editor-page__bottom-panel { height: 150px; border-top: 1px solid rgb(var(--outline-variant)); padding: var(--space-xs); overflow-y: auto; background: rgb(var(--surface-container)); font-family: var(--font-mono); font-size: var(--text-xs); }
+
+  /* Dashboard grid */
+  .af-dashboard__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+
+  /* Metrics grid */
+  .af-metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+
+  /* Execution detail */
+  .af-execution-detail__actions { display: flex; gap: 0.5rem; }
+
+  /* React Flow Node (IDE style) */
+  .af-node { border: 1px solid rgb(var(--outline-variant)); border-radius: var(--radius-lg); background: rgb(var(--surface-container-low)); min-width: 180px; box-shadow: none; }
+  .af-node--selected { border-color: rgb(var(--accent-primary)); box-shadow: 0 0 0 1px rgb(var(--accent-primary)), 0 4px 12px rgba(0, 0, 0, 0.45); }
+  .af-node__header { display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.75rem; border-radius: var(--radius-lg) var(--radius-lg) 0 0; color: white; font-size: var(--text-xs); font-weight: 600; border-left: 3px solid currentColor; }
+  .af-node__body { padding: 0.5rem 0.75rem; }
+  .af-node__name { font-weight: 500; margin-bottom: 0.25rem; }
+  .af-node__ref { font-size: var(--text-xs); color: rgb(var(--outline)); }
+  .af-node__ref-label { font-weight: 600; margin-right: 0.25rem; }
+  .af-handle { width: 8px; height: 8px; background: rgb(var(--surface-container-highest)); border: 1.5px solid rgb(var(--outline-variant)); border-radius: 9999px; }
+  .af-handle--active { background: rgb(var(--accent-primary)); }
+
+  /* Search */
+  .af-search-bar { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+  .af-search-filters { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .af-search-result-groups { display: flex; flex-direction: column; gap: 1rem; }
+
+  /* State delta */
+  .af-state-delta { display: flex; gap: 1rem; }
+  .af-state-delta__before, .af-state-delta__after { flex: 1; }
+
+  /* Trace tree */
+  .af-trace-tree { padding: 0.5rem 0; }
+  .af-trace-node { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.375rem 0; }
+  .af-trace-node--child { padding-left: 1.5rem; }
+  .af-trace-node__type { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; color: rgb(var(--outline)); min-width: 80px; font-family: var(--font-mono); }
+  .af-trace-node__name { font-size: var(--text-sm); font-weight: 500; }
+  .af-trace-children { padding-left: 1rem; border-left: 1px solid rgb(var(--outline-variant)); margin-left: 0.5rem; }
+
+  /* Context segments */
+  .af-context-summary { margin-bottom: 1rem; }
+  .af-context-segments { display: flex; flex-direction: column; gap: 0.25rem; }
+
+  /* Event list */
+  .af-event-list { display: flex; flex-direction: column; gap: 0.25rem; }
+
+  /* Recovery */
+  .af-recovery-decisions { display: flex; flex-direction: column; gap: 0.5rem; margin: 1rem 0; }
+
+  /* Pipeline */
+  .af-pipeline-stages { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+  .af-pipeline { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+  .af-pipeline__stage { display: flex; align-items: center; }
+
+  /* Regression */
+  .af-regression__selectors { display: flex; gap: 1rem; margin-bottom: 1rem; }
+
+  /* Definition sections */
+  .af-definition-sections { display: flex; flex-direction: column; gap: 1rem; }
+
+  /* Capability types */
+  .af-capability-types { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+  /* Form row */
+  .af-form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  /* Diff */
+  .af-diff-result { margin-top: 1rem; }
+  .af-diff-summary { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+  .af-graph-diff__panels { display: flex; gap: 1rem; }
+  .af-graph-diff__panel { flex: 1; min-height: 200px; }
+
+  /* Version lifecycle */
+  .af-version-lifecycle { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+  /* Conflict viewer */
+  .af-conflict-viewer { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .af-conflict-node { flex: 1; min-width: 200px; }
+  .af-conflict-resolver { flex: 1; min-width: 200px; }
+
+  /* HITL */
+  .af-hitl-card__actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+
+  /* Loop iterations */
+  .af-loop-summary, .af-loop-iterations { margin-bottom: 1rem; }
+
+  /* Report */
+  .af-report__summary, .af-report__performance { margin-bottom: 1.5rem; }
+  .af-report__fingerprint { margin-top: 1.5rem; }
+
+  /* Search result group */
+  .af-search-result-group { }
+}
